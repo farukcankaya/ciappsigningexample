@@ -12,7 +12,6 @@ before_install:
 - yes | sdkmanager "platforms;android-28"
 before_script:
 - "echo \"Build process is started \U0001F46F\""
-- echo $TRAVIS_BUILD_DIR
 - echo $DEBUG_KEYSTORE_BASE64
 - echo $DEBUG_KEYSTORE_BASE64 | base64 -d > $debugKeyStore
 - echo $RELEASE_KEYSTORE_BASE64 | base64 -d > $releaseKeyStore
@@ -31,6 +30,8 @@ deploy:
   provider: releases
   api_key:
     secure: OsArqIIvwvbiZJRIORkiZ6wTDD8Yu09Kd4YMKIrjUQFUahZQBA9Vx8nvEsL/JCR4Mr231l+l46EUB/MKhJqwvWQLJTuRQbJQVZ+qROWShoWbf4/DxnvCafpKtq36TeUVqO2jLSLynVopLti82KEy7zp/cf8UxQ+Vhp3PbgIasMAgBM+zl95gGH1tuk6RYMyz5THmh4ezVpgMNjOYPfMq3L5OP9O3rtCNd5aD3H05RMcTBl9kvdR711+XojthERz6YpfcO5Wa8jVxE/pUn1lLZUxIulGB/KrR8aJYg76I3JC4zXfKSMq5wZffzHYbXyAomK7P0u/lYm1LLCuST9FecOvjmXGAbGPOQicwu4VvCzLja+0iBrt+NqoCaUKkuCOGy3Lc2ykmHDaTwijtyld+Ij9ORtyazkjaSF0fds+BvHyFiMF4v8Hcs9jquxyvZLSfYe5QI8XTFPEzI3qSwFt3ukWFuGI9iy3PGQYINHA7U04ZCIIJ4kr0AzwvrMevW+ofiI8ObZZfXnjJ70w1FxCWn8/eLkgFvaFTpVD1N9MjSMqZ/CRQnJAAmpWJ1RSr1zoa9IOX6uAYlxpHQx6skmcENXWDBqCXMP0pTirL5uEWoe1Yt9TpKNzJBCtlVR5TWZuB1vi0+VDSCosxIHxCcAkC5AAjlgKqyftQMFt9CNm9z4I=
-  file: " $TRAVIS_BUILD_DIR/app/build/outputs/apk/release/app-release.apk"
+  file: 'app/build/outputs/apk/release/app-release.apk'
+  overwrite: true
+  skip_cleanup: true
   on:
     repo: farukcankaya/ciappsigningexample
