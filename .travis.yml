@@ -33,14 +33,19 @@ before_script:
   - echo $DEBUG_KEYSTORE_BASE64 | base64 -d > $debugKeyStore
   - echo $RELEASE_KEYSTORE_BASE64 | base64 -d > $releaseKeyStore
   - printf 'debugKeyAlias=%s\ndebugKeyPassword=%s\ndebugKeyStore=%s\ndebugStorePassword=%s\nreleaseKeyAlias=%s\nreleaseKeyPassword=%s\nreleaseKeyStore=%s\nreleaseStorePassword=%s' $debugKeyAlias $debugKeyPassword $debugKeyStore $debugStorePassword $releaseKeyAlias $releaseKeyPassword $releaseKeyStore $releaseStorePassword > keystore.properties
-before_cache:
-  - rm -rf app/build/test-results/
-  - rm -rf app/build/outputs/apk/
 script:
   - ./gradlew androidDependencies
   - ./gradlew lint test
   - ./gradlew clean assembleRelease --no-daemon --stacktrace
-cache:
-  directories:
-    - app/build/test-results/
-    - app/build/outputs/apk/
+before_deploy:
+  # Set up git user name and tag this commit
+  - git config --local user.name "Faruk Cankaya"
+  - git config --local user.email "farukcankayaaa@gmail.com"
+  - git tag "$(date +'%Y%m%d%H%M%S')-$(git log --format=%h -1)"
+deploy:
+  provider: releases
+  api_key:
+    secure: "TwYnea1RYb3pfhYbJC1vARaitEOZj8T3PR+4k+F8w2OZ8hKF/73jg2PwG9a3PbhfvJKnjOVdUJEpRIx8ciIftS1liDV0RTyOCybK6s1RuLY890UtlJJbADYwuyL8ULoxEGwjA91/ytHV4ReKFeNK0AKe40EtjTgD+SLYac5XQ3hdq8LLOKH6GDT7OM/9mWZ6zQVb0QbnqdSx1F+zlLGprDQN2WwO2/vEkDOCV4yseDC/V5TIC3Zh4hrX+0kL9MRMypNDg4XauPTUNBOl49DZvRbe9VqBQgVk8eNYN20QB9fAtRRuSTiC3sfmDTk6wBOyYi/axLVNa2h9ZgC9+sMypU6dD43/V8rOVUP5A11B74YfYv/iHBzqGHc2dgie09KxJaHbQ8aIJs55xqPOcXCdY98O8kFgg6YAkPiil+wkYHFybAY9VeRDf882TeG/0a7+CnS59Pp089IAwTa2X7/CHZbpKjbSrLFbtLbSu9Kl5x0iw/jEaUevEkoH7vo4PSFR8MludGZqRXJR0y5NSkwQMIIo8mTVtH/n0XQsWqgtxCrUMnssSNFUd5nAnp9lZlaZ340pzrYqHkV8nzb66RMKXrnG+RBH5rHIgfmoKZiSvBlqaDha51FQSPAnTd4z0rDb+ZQcBpq0DUuqWNZMVF/WK4Cb6YmKS22cHYKKUF8MSKM="
+  file: app/build/outputs/apk/release/app-release.apk
+  overwrite: true
+  skip_cleanup: true
