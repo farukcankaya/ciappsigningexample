@@ -1,4 +1,4 @@
-## Store encrypted keystore file in version control system
+## Store encrypted keystore file in version control system [![CircleCI](https://circleci.com/gh/farukcankaya/ciappsigningexample/tree/feature%2Fencrypted-keystore.svg?style=svg)](https://circleci.com/gh/farukcankaya/ciappsigningexample/tree/feature%2Fencrypted-keystore) [![Build Status](https://travis-ci.org/farukcankaya/ciappsigningexample.svg?branch=feature%2Fencrypted-keystore)](https://travis-ci.org/farukcankaya/ciappsigningexample)
 This repo is created for <a href="https://medium.com/@farukcankaya/where-to-store-android-keystore-file-in-ci-cd-cycle-2365f4e02e57">Where to Store Android KeyStore File in CI/CD Cycle</a> article in medium. You can take a look to get the story.
 There are 3 branches in this repo and you are in the <a href="https://github.com/farukcankaya/ciappsigningexample/tree/feature/encrypted-keystore">feature/encrypted-keystore</a>
 
