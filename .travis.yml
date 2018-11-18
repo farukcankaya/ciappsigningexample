@@ -1,0 +1,36 @@
+language: android
+jdk: oraclejdk8
+sudo: false
+android:
+  components:
+  - tools
+  - platform-tools
+  - build-tools-28.0.3
+  - android-28
+  - extra-google-m2repository
+before_install:
+- yes | sdkmanager "platforms;android-28"
+before_script:
+- "echo \"Build process is started \U0001F46F\""
+- openssl aes-256-cbc -d -in $debugKeyStore.encrypted -k $DEBUG_ENCRYPT_SECRET_KEY >> $debugKeyStore
+- openssl aes-256-cbc -d -in $releaseKeyStore.encrypted -k $RELEASE_ENCRYPT_SECRET_KEY >> $releaseKeyStore
+- printf 'debugKeyAlias=%s\ndebugKeyPassword=%s\ndebugKeyStore=%s\ndebugStorePassword=%s\nreleaseKeyAlias=%s\nreleaseKeyPassword=%s\nreleaseKeyStore=%s\nreleaseStorePassword=%s'
+  $debugKeyAlias $debugKeyPassword $debugKeyStore $debugStorePassword $releaseKeyAlias
+  $releaseKeyPassword $releaseKeyStore $releaseStorePassword > keystore.properties
+script:
+- "./gradlew androidDependencies"
+- "./gradlew lint test"
+- "./gradlew clean assembleRelease --no-daemon --stacktrace"
+before_deploy:
+- git config --local user.name "Faruk Cankaya"
+- git config --local user.email "farukcankayaaa@gmail.com"
+- git tag "$(date +'%Y%m%d%H%M%S')-$(git log --format=%h -1)"
+deploy:
+  provider: releases
+  api_key:
+    secure: GP/rpwz5XeWMVv13epiNzaJTraNwhSBszvTANu1W8Q6djrHUx3sGIOdZgfT+t71kBEVNt50pnr8JjkuORWkvMalDZM2lA88JewVlR3RvdTh3ze5krBaHIBPl1+u+cnkoGlAZ9LZgRfluBxcbu0jfOMna3ytrnG7x0+g93pW61kcRmHNeegaLqyM8QOsmSteZKdVNRxSzMzGmPU3QtZjCustM0qoFuvMsD04ZPsdo3UmYOByvX37tZa25KmYaBBIbsLhJkew6qvoVifSPaIrqVCEWdOypmFvSWuMRgTHhOTMb7dDcqWGK9i8uv0Wgak7t0XU43Wzsf5LxJ17xQ84XqUxs7K+vGQX/gXBFvsXBkf1tRNJDnO7PVU1MHMoeQbLXzabOT1RiUrSp0VH90QNwopFP0Tql0SvNPF6kELRWMw8TNDRMCT1AtDF8AAIdMqteIRugMxk7gTrR+F+tbP6yB+qpqOgL94sdQ7/pvJv/VKkb+hfB3WyisIRdJC2wjoBoOYO+7kM7qzyBPaXsOAdqnKgtsxv2gMUWW9hD+smWAMqiNE4aIMh3J15A9oqpIG/r6pgvNTC/jaBOLGubpOMEDtZ2dOoh3oZDWEA+FvF5faqNm6+N9VbTRXMLyf5JFKWo9JfYAnFitkXlIeIqHBybWdcpX2Ds3OIOQpi2Q3Wak50=
+  file: 'app/build/outputs/apk/release/app-release.apk'
+  overwrite: true
+  skip_cleanup: true
+  on:
+    repo: farukcankaya/ciappsigningexample

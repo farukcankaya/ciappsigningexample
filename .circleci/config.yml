@@ -1,0 +1,45 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/code
+    docker:
+      - image: circleci/android:api-28-alpha
+    environment:
+      JVM_OPTS: -Xmx4G
+    steps:
+      - checkout
+      - run: echo "Build process is started 👯"
+      - run:
+          name: Create debug.keystore.jks
+          command: openssl aes-256-cbc -d -in $debugKeyStore.encrypted -k $DEBUG_ENCRYPT_SECRET_KEY >> $debugKeyStore
+      - run:
+          name: Create release.keystore.jks
+          command: openssl aes-256-cbc -d -in $releaseKeyStore.encrypted -k $RELEASE_ENCRYPT_SECRET_KEY >> $releaseKeyStore
+      - run:
+          name: Create keystore.properies
+          command: printf 'debugKeyAlias=%s\ndebugKeyPassword=%s\ndebugKeyStore=%s\ndebugStorePassword=%s\nreleaseKeyAlias=%s\nreleaseKeyPassword=%s\nreleaseKeyStore=%s\nreleaseStorePassword=%s' $debugKeyAlias $debugKeyPassword $debugKeyStore $debugStorePassword $releaseKeyAlias $releaseKeyPassword $releaseKeyStore $releaseStorePassword > keystore.properties
+      - restore_cache:
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
+      - run:
+          name: Download Dependencies
+          command: ./gradlew androidDependencies
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
+      - run:
+          name: Run Tests
+          command: ./gradlew lint test
+      - store_test_results:
+          path: app/build/test-results
+          destination: test-results/
+      - run:
+          name: Initial build
+          command: ./gradlew clean assembleRelease --no-daemon --stacktrace
+      - store_artifacts:
+          path: app/build/outputs/apk/
+          destination: apks/
+      - deploy:
+          name: "Deploy to Fabric 🎉🎉"
+          command: |
+            echo "Run gradle task to upload generated APK to Fabric"
