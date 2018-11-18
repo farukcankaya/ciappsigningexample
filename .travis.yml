@@ -33,7 +33,14 @@ before_script:
   - echo $DEBUG_KEYSTORE_BASE64 | base64 -d > $debugKeyStore
   - echo $RELEASE_KEYSTORE_BASE64 | base64 -d > $releaseKeyStore
   - printf 'debugKeyAlias=%s\ndebugKeyPassword=%s\ndebugKeyStore=%s\ndebugStorePassword=%s\nreleaseKeyAlias=%s\nreleaseKeyPassword=%s\nreleaseKeyStore=%s\nreleaseStorePassword=%s' $debugKeyAlias $debugKeyPassword $debugKeyStore $debugStorePassword $releaseKeyAlias $releaseKeyPassword $releaseKeyStore $releaseStorePassword > keystore.properties
+before_cache:
+  - rm -rf app/build/test-results/
+  - rm -rf app/build/outputs/apk/
 script:
   - ./gradlew androidDependencies
   - ./gradlew lint test
   - ./gradlew clean assembleRelease --no-daemon --stacktrace
+cache:
+  directories:
+    - app/build/test-results/
+    - app/build/outputs/apk/
