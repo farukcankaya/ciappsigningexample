@@ -11,10 +11,10 @@ jobs:
       - run: echo "Build process is started 👯"
       - run:
           name: Create debug.keystore.jks
-          command: openssl aes-256-cbc -d -in "${debugKeyStore}.encrypted" -k "${DEBUG_ENCRYPT_SECRET_KEY}" >> $debugKeyStore
+          command: openssl aes-256-cbc -d -in "${debugKeyStore}.encrypted" -k $DEBUG_ENCRYPT_SECRET_KEY >> $debugKeyStore
       - run:
           name: Create release.keystore.jks
-          command: openssl aes-256-cbc -d -in "${releaseKeyStore}.encrypted" -k "${$RELEASE_ENCRYPT_SECRET_KEY}" >> $releaseKeyStore
+          command: openssl aes-256-cbc -d -in "${releaseKeyStore}.encrypted" -k $RELEASE_ENCRYPT_SECRET_KEY >> $releaseKeyStore
       - run:
           name: Create keystore.properies
           command: printf 'debugKeyAlias=%s\ndebugKeyPassword=%s\ndebugKeyStore=%s\ndebugStorePassword=%s\nreleaseKeyAlias=%s\nreleaseKeyPassword=%s\nreleaseKeyStore=%s\nreleaseStorePassword=%s' $debugKeyAlias $debugKeyPassword $debugKeyStore $debugStorePassword $releaseKeyAlias $releaseKeyPassword $releaseKeyStore $releaseStorePassword > keystore.properties
