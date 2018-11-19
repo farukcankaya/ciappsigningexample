@@ -107,6 +107,20 @@ Environment variables should looked like below in **Travis CI**:
 
   It generates encrypted keystore file named **debug.keystore.jks.encrypted**. Now, you can store this file in version control system. It is usable just with your secret key.
 
+### Troubleshooting
+- #### Check openssl version of your machine and CI tools
+  You can check openssl version with this command: `openssl version -a`. If there is a version difference, you may not decrypt your file in CI. I faced with this problem. Openssl version is 1.0.1 in my machine and Travis CI also uses **OpenSSL 1.0.1f 6 Jan 2014** as default. But, Circle CI uses **OpenSSL 1.1.0f  25 May 2017** as default. I encrypt keystore file in my machine and Travis can decrypt this file and build the project successfully. However, Circle CI throws exception below:
+  ```
+  #!/bin/bash -eo pipefail
+   openssl aes-256-cbc -d -in "${debugKeyStore}.encrypted" -k $DEBUG_ENCRYPT_SECRET_KEY >> $debugKeyStore
+   bad decrypt
+   139749679224064:error:06065064:digital envelope routines:EVP_DecryptFinal_ex:bad decrypt:../crypto/evp/evp_enc.c:535:
+   Exited with code 1
+  ```
+  Thanks to issued <a href="https://github.com/fastlane/fastlane/issues/9542">here</a>, we force the openssl in Circle CI to use older version with `-md md5` option.
+  Final decryption command should like this:
+  `openssl aes-256-cbc -d -in "${debugKeyStore}.encrypted" -k $DEBUG_ENCRYPT_SECRET_KEY -md md5 >> $debugKeyStore`  
+
 
 ### Feel free to contribute
 You can open an issue or send pull request about my faults.
