@@ -16,7 +16,7 @@ jobs:
           name: Create release.keystore.jks
           command: openssl aes-256-cbc -d -in "${releaseKeyStore}.encrypted" -k $RELEASE_ENCRYPT_SECRET_KEY -md md5 >> $releaseKeyStore
       - run:
-          name: Create keystore.properies
+          name: Create keystore.properties
           command: printf 'debugKeyAlias=%s\ndebugKeyPassword=%s\ndebugKeyStore=%s\ndebugStorePassword=%s\nreleaseKeyAlias=%s\nreleaseKeyPassword=%s\nreleaseKeyStore=%s\nreleaseStorePassword=%s' $debugKeyAlias $debugKeyPassword $debugKeyStore $debugStorePassword $releaseKeyAlias $releaseKeyPassword $releaseKeyStore $releaseStorePassword > keystore.properties
       - restore_cache:
           key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
